@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "todo-cli"
+version = "0.1.0"
+description = "Simple file-backed to-do CLI"
+readme = "README.md"
+requires-python = ">=3.8"
+authors = [ { name = "Sean" } ]
+
+[project.scripts]
+# Adds a `todo` command that points to `todo_cli.cli:main`
+todo = "todo_cli.cli:main"
