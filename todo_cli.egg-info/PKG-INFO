@@ -41,39 +41,3 @@ Run tests:
 python -m pip install -r requirements.txt
 python -m pytest -q
 ```
-
-Publishing to PyPI
-------------------
-
-Quick outline to publish a release (recommended: use GitHub Actions):
-
-1. Create an account on https://pypi.org/ and generate an API token at https://pypi.org/manage/account/
-2. In your GitHub repo, add the token as a repository secret named `PYPI_API_TOKEN`.
-3. Create a git tag for the release (match pattern `vX.Y.Z`) and push it:
-
-```bash
-git tag v0.1.0
-git push origin v0.1.0
-```
-
-The included GitHub Actions workflow `.github/workflows/publish.yml` will build and publish the package automatically when a tag is pushed or a release is created.
-
-Local publish (if you prefer to upload from your machine):
-
-Windows PowerShell:
-```powershell
-setx PYPI_API_TOKEN "<token>"
-.\.venv\Scripts\Activate.ps1
-./scripts/publish_local.ps1
-```
-
-Linux / macOS:
-```bash
-export PYPI_API_TOKEN="<token>"
-./scripts/publish_local.sh
-```
-
-Notes:
-- The GitHub Action expects a secret named `PYPI_API_TOKEN` containing a PyPI API token.
-- Publishing requires that the `name` and `version` in `pyproject.toml` are ready for release and not already on PyPI.
-- I cannot publish to PyPI for you without your PyPI token and pushing tags to a remote repo; I added automation so the upload is a single secure step once you provide the token in GitHub secrets.
