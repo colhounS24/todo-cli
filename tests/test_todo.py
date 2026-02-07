@@ -1,4 +1,7 @@
-from todo import ToDoList
+try:
+    from todo import ToDoList
+except Exception:
+    from todo_cli.todo import ToDoList
 
 
 def test_add_and_list_and_complete_and_remove(tmp_path):
@@ -21,3 +24,12 @@ def test_add_and_list_and_complete_and_remove(tmp_path):
 
     store.clear()
     assert store.list() == []
+
+def test_due_date_is_stored(tmp_path):
+    p = tmp_path / "tasks.json"
+    store = ToDoList(str(p))
+
+    store.add('due task', due='2026-02-08')
+    tasks = store.list()
+    assert len(tasks) == 1
+    assert tasks[0]['due'] == '2026-02-08'

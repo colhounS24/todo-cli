@@ -2,14 +2,28 @@
 import argparse
 import sys
 from todo import ToDoList
+from datetime import date, timedelta
+from dateutil import parser as dateparser
+
 
 def print_tasks(tasks):
     if not tasks:
         print("No tasks.")
         return
+    today = date.today()
     for i, t in enumerate(tasks):
         status = "x" if t.get("done") else " "
-        print(f"[{status}] {i}: {t.get('title')}")
+        due = t.get("due")
+        due_str = f" due: {due}" if due else ""
+        overdue = ""
+        if due and not t.get("done"):
+            try:
+                if date.fromisoformat(due) < today:
+                    overdue = " [OVERDUE]"
+            except Exception:
+                pass
+        print(f"[{status}] {i}: {t.get('title')}{due_str}{overdue}")
+
 
 def main(argv=None):
     argv = argv or sys.argv[1:]
@@ -19,6 +33,7 @@ def main(argv=None):
 
     a_add = sub.add_parser('add', help='Add a task')
     a_add.add_argument('title', nargs='+', help='Task title')
+    a_add.add_argument('--due', help='Due date (YYYY-MM-DD, today, tomorrow, or parseable date)')
 
     sub.add_parser('list', help='List tasks')
 
@@ -35,7 +50,21 @@ def main(argv=None):
 
     if ns.cmd == 'add':
         title = ' '.join(ns.title)
-        store.add(title)
+        due_iso = None
+        if getattr(ns, 'due', None):
+            s = ns.due.strip().lower()
+            if s == 'today':
+                due_iso = date.today().isoformat()
+            elif s == 'tomorrow':
+                due_iso = (date.today() + timedelta(days=1)).isoformat()
+            else:
+                try:
+                    dt = dateparser.parse(ns.due)
+                    due_iso = dt.date().isoformat()
+                except Exception:
+                    print('Unable to parse due date:', ns.due)
+                    return
+        store.add(title, due_iso)
         print('Added:', title)
     elif ns.cmd == 'list' or ns.cmd is None:
         print_tasks(store.list())
@@ -52,6 +81,7 @@ def main(argv=None):
     elif ns.cmd == 'clear':
         store.clear()
         print('All tasks removed')
+
 
 if __name__ == '__main__':
     main()

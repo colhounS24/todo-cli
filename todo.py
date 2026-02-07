@@ -1,5 +1,7 @@
 import json
-from typing import List, Dict
+from typing import List, Dict, Optional
+from datetime import date
+
 
 class ToDoList:
     def __init__(self, path: str = "tasks.json"):
@@ -18,8 +20,9 @@ class ToDoList:
         with open(self.path, "w", encoding="utf-8") as f:
             json.dump(self.tasks, f, indent=2, ensure_ascii=False)
 
-    def add(self, title: str) -> None:
-        self.tasks.append({"title": title, "done": False})
+    def add(self, title: str, due: Optional[str] = None) -> None:
+        # `due` should be an ISO date string (YYYY-MM-DD) or None
+        self.tasks.append({"title": title, "done": False, "due": due})
         self.save()
 
     def list(self) -> List[Dict]:
@@ -42,3 +45,16 @@ class ToDoList:
     def clear(self) -> None:
         self.tasks = []
         self.save()
+
+    def overdue(self) -> List[Dict]:
+        today = date.today()
+        overdue = []
+        for t in self.tasks:
+            d = t.get("due")
+            if d and not t.get("done"):
+                try:
+                    if date.fromisoformat(d) < today:
+                        overdue.append(t)
+                except Exception:
+                    continue
+        return overdue
