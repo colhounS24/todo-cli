@@ -4,6 +4,9 @@ import sys
 from .todo import ToDoList
 from datetime import date, timedelta
 from dateutil import parser as dateparser
+from colorama import init, Fore, Style
+
+init(autoreset=True)
 
 
 def print_tasks(tasks):
@@ -16,13 +19,25 @@ def print_tasks(tasks):
         due = t.get("due")
         due_str = f" || Due: {due}" if due else ""
         overdue = ""
-        if due and not t.get("done"):
+        # choose color
+        if t.get("done"):
+            color = Fore.GREEN
+        elif due:
             try:
-                if date.fromisoformat(due) < today:
+                d = date.fromisoformat(due)
+                if d < today:
+                    color = Fore.RED
                     overdue = " [OVERDUE]"
+                elif d == today:
+                    color = Fore.YELLOW
+                else:
+                    color = Fore.CYAN
             except Exception:
-                pass
-        print(f"[{status}] {i}: {t.get('title')}{due_str}{overdue}")
+                color = Fore.CYAN
+        else:
+            color = Fore.RESET
+
+        print(f"{color}[{status}] {i}: {t.get('title')}{due_str}{overdue}{Style.RESET_ALL}")
 
 
 def main(argv=None):
