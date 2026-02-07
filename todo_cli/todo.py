@@ -58,3 +58,16 @@ class ToDoList:
                 except Exception:
                     continue
         return overdue
+
+    def due_today(self) -> List[Dict]:
+        today = date.today()
+        result = []
+        for t in self.tasks:
+            d = t.get("due")
+            if d and not t.get("done"):
+                try:
+                    if date.fromisoformat(d) == today:
+                        result.append(t)
+                except Exception:
+                    continue
+        return result

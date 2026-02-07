@@ -35,7 +35,8 @@ def main(argv=None):
     a_add.add_argument('title', nargs='+', help='Task title')
     a_add.add_argument('--due', help='Due date (YYYY-MM-DD, today, tomorrow, or parseable date)')
 
-    sub.add_parser('list', help='List tasks')
+    a_list = sub.add_parser('list', help='List tasks')
+    a_list.add_argument('--due-today', action='store_true', dest='due_today', help='Show tasks due today only')
 
     a_complete = sub.add_parser('complete', help='Mark task complete')
     a_complete.add_argument('index', type=int, help='Task index')
@@ -67,7 +68,10 @@ def main(argv=None):
         store.add(title, due_iso)
         print('Added:', title)
     elif ns.cmd == 'list' or ns.cmd is None:
-        print_tasks(store.list())
+        if getattr(ns, 'due_today', False):
+            print_tasks(store.due_today())
+        else:
+            print_tasks(store.list())
     elif ns.cmd == 'complete':
         if store.complete(ns.index):
             print('Marked complete:', ns.index)

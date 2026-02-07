@@ -1,3 +1,5 @@
+from datetime import date
+
 try:
     from todo import ToDoList
 except Exception:
@@ -25,6 +27,7 @@ def test_add_and_list_and_complete_and_remove(tmp_path):
     store.clear()
     assert store.list() == []
 
+
 def test_due_date_is_stored(tmp_path):
     p = tmp_path / "tasks.json"
     store = ToDoList(str(p))
@@ -33,3 +36,16 @@ def test_due_date_is_stored(tmp_path):
     tasks = store.list()
     assert len(tasks) == 1
     assert tasks[0]['due'] == '2026-02-08'
+
+
+def test_due_today_filter(tmp_path):
+    p = tmp_path / "tasks.json"
+    store = ToDoList(str(p))
+
+    today = date.today().isoformat()
+    store.add('today task', due=today)
+    store.add('future task', due='2099-01-01')
+
+    res = store.due_today()
+    assert len(res) == 1
+    assert res[0]['title'] == 'today task'
