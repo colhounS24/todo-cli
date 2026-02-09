@@ -4,7 +4,7 @@ from datetime import date
 
 
 class ToDoList:
-    def __init__(self, path: str = "C:\\tasks.json"):
+    def __init__(self, path: str = "tasks.json"):
         self.path = path
         self.tasks: List[Dict] = []
         self.load()
